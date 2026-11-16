@@ -1,0 +1,95 @@
+; Your Child's First Phone - SIP accounts.
+; Copy to pjsip.conf and replace every CHANGE-ME / HOUSE-USERNAME (scripts/setup.sh helps).
+;
+; IMPORTANT: ";" starts a comment in Asterisk config files. A literal semicolon inside a
+; value (as in "sip:host;transport=tcp") must be written "\;" or the rest is silently dropped.
+
+[global]
+type=global
+keep_alive_interval=30      ; keeps the outgoing TCP connection to linphone.org open
+
+[transport-udp]
+type=transport
+protocol=udp
+bind=0.0.0.0:5060
+
+; TCP is used for the outgoing connection to linphone.org. Incoming calls come back
+; down that same connection, so nothing needs opening on the router.
+[transport-tcp]
+type=transport
+protocol=tcp
+bind=0.0.0.0:5060
+
+; ---- The child's phone: the analog adapter (ATA) signs in with this account.
+; For testing you can sign a softphone (Linphone "third-party SIP account") in to it.
+[kid]
+type=endpoint
+context=from-phone
+disallow=all
+allow=ulaw,alaw
+auth=kid
+aors=kid
+direct_media=no
+rtp_symmetric=yes
+force_rport=yes
+rewrite_contact=yes
+[kid]
+type=auth
+auth_type=userpass
+username=kid
+password=CHANGE-ME-KID-PASSWORD
+[kid]
+type=aor
+max_contacts=1
+remove_existing=yes
+
+; ---- linphone.org: the server signs in as HOUSE-USERNAME@sip.linphone.org on the
+; child's behalf. Relatives call that address from the Linphone app.
+[linphone-reg]
+type=registration
+transport=transport-tcp
+outbound_auth=linphone-auth
+server_uri=sip:sip.linphone.org\;transport=tcp
+client_uri=sip:HOUSE-USERNAME@sip.linphone.org
+contact_user=HOUSE-USERNAME
+retry_interval=60
+forbidden_retry_interval=600
+expiration=600
+line=yes
+endpoint=linphone
+
+[linphone-auth]
+type=auth
+auth_type=userpass
+username=HOUSE-USERNAME
+password=CHANGE-ME-HOUSE-LINPHONE-PASSWORD
+
+[linphone]
+type=endpoint
+context=from-linphone
+disallow=all
+allow=opus,ulaw,alaw
+outbound_auth=linphone-auth
+aors=linphone
+from_user=HOUSE-USERNAME
+from_domain=sip.linphone.org
+transport=transport-tcp
+; Linphone apps offer encrypted audio (SRTP) in the "AVPF" profile first. Without these
+; three lines every incoming call fails once with "488 Not Acceptable Here" and retries.
+media_encryption=sdes
+media_encryption_optimistic=yes
+use_avpf=yes
+direct_media=no
+rtp_symmetric=yes
+force_rport=yes
+rewrite_contact=yes
+
+[linphone]
+type=aor
+contact=sip:sip.linphone.org\;transport=tcp
+qualify_frequency=25
+
+[linphone]
+type=identify
+endpoint=linphone
+match=sip.linphone.org

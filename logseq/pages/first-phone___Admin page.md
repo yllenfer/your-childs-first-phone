@@ -1,0 +1,13 @@
+- Back to [[first-phone]]
+- Address: `http://<server>:8099` - plain HTTP, for the home network or a private VPN only.
+- ## Pages
+	- **Register** - first visit only. Child's name, username, password (10+ characters). Closes once an account exists.
+	- **Log in** - 30-day session per device.
+	- **Main page** - keypad of buttons, connection badges, "Who can call" list.
+	- **Button** - name + Linphone username. Saving also adds the person to the allowed list.
+	- **Settings** - child's name, house Linphone address, change password (signs out other devices).
+- ## Where it stores things
+	- `webui-data/config.json` - username, salted password hash (PBKDF2-SHA256), child's name, house address, cookie key.
+	- Asterisk database - buttons and allowed callers. See [[first-phone/Asterisk]].
+- ## Forgot the password
+	- Stop the page, delete `webui-data/config.json`, start it, and register again. Buttons and allowed callers are kept.

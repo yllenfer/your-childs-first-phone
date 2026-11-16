@@ -1,0 +1,11 @@
+- Back to [[first-phone]]
+- TODO Test the analog adapter (Cisco SPA112) with a real corded phone: register as `kid`, single-digit dial plan, echo test
+- TODO Buy and set up the photo phone; program each picture button to one digit
+- TODO Long call test with a relative in another country (audio quality, call stays up past 30 minutes)
+- TODO Confirm audio both ways on a child-to-relative call through the server
+- TODO Add the remaining relatives as buttons
+- TODO Back up the server folder once everything works
+- TODO Decide whether to add a real phone number (SIP trunk) for relatives who will not install an app
+- TODO Test the Debian VM install path
+- LATER Ringing hours (no calls at night)
+- LATER HTTPS for the admin page

@@ -1,0 +1,27 @@
+services:
+  asterisk:
+    # andrius/asterisk:latest as of 2026-11-16 = Asterisk 23.5.0, pinned by digest.
+    image: andrius/asterisk@sha256:3b8821840c860a41cd770c71295a5ae38f218ff17229b691bf617de0a33782c6
+    container_name: asterisk
+    network_mode: host          # SIP 5060 + audio 10000-20000/UDP. Never forward these on your router.
+    restart: unless-stopped
+    volumes:
+      - ./pjsip.conf:/etc/asterisk/pjsip.conf:ro
+      - ./extensions.conf:/etc/asterisk/extensions.conf:ro
+      - ./manager.conf:/etc/asterisk/manager.conf:ro
+      # Buttons and allowed callers live in Asterisk's database. Asterisk 23 ignores
+      # the astdbdir setting, so the file itself is mounted. Create it first (scripts/setup.sh does).
+      - ./db/astdb.sqlite3:/var/lib/asterisk/astdb.sqlite3
+  webui:
+    build: ./webui
+    container_name: phone-webui
+    network_mode: host          # reaches Asterisk's manager port on 127.0.0.1:5038
+    restart: unless-stopped
+    depends_on: [asterisk]
+    user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
+    environment:
+      AMI_SECRET: ${AMI_SECRET}
+      KID_ENDPOINT: ${KID_ENDPOINT:-kid}
+      PORT: ${WEB_PORT:-8099}
+    volumes:
+      - ./webui-data:/data      # parent account + child's name

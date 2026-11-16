@@ -1,0 +1,18 @@
+- Back to [[first-phone]]
+- ## Two kinds of account (all free, on linphone.org)
+	- **House account** (example `samhome`) - only the server signs in to it. Never a phone.
+	- **Personal account** per relative (example `nana123`) - in their Linphone app.
+- ## House account
+	- Create at https://subscribe.linphone.org, activate by email. Each account needs its own email address.
+	- Give username and password to `./scripts/setup.sh`.
+	- **Never sign a phone in to it.** linphone.org would ring that phone directly and skip the allowed list. See [[first-phone/Troubleshooting]].
+- ## Each relative
+	- Install Linphone -> **Create a Linphone account** -> tell you the username.
+	- You: admin page -> tap a button -> name + username -> Save.
+	- They call the house username to reach the child.
+- ## Testing without the adapter
+	- Linphone -> **Use a SIP account**: username `kid`, password from `pjsip.conf`, domain = server address, UDP. Phone must be on the home network or the same VPN.
+	- Phones put the app to sleep, so this is for testing only.
+- ## Why linphone.org
+	- Maintained apps on Android and iPhone, wakes the app for calls, relays audio, accepted a sign-in from Asterisk on 2026-11-16.
+	- Free community service, no guarantee.

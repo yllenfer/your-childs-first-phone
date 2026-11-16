@@ -1,0 +1,13 @@
+; Asterisk manager interface (AMI). Only the web page uses it, only from this machine,
+; and only with permission to run CLI commands.
+[general]
+enabled=yes
+port=5038
+bindaddr=127.0.0.1
+
+[webui]
+secret=change-me            ; must match AMI_SECRET in .env
+deny=0.0.0.0/0.0.0.0
+permit=127.0.0.1/255.255.255.255
+read=command
+write=command

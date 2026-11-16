@@ -1,0 +1,28 @@
+- Back to [[first-phone]]
+- Every item here happened on [[Nov 16th, 2026]].
+- ## Someone not on the list can still call
+	- Cause: a phone was once signed in to the house account. linphone.org keeps it as a device and rings it directly. Logging out in the app does not remove it.
+	- Fix: subscribe.linphone.org -> sign in as the house account -> Devices -> Manage -> delete every phone, keep the server.
+	- Proof the server blocks: log shows `Linphone call from user=...` then `Hangup(... "21")`.
+- ## Incoming calls never reach the server
+	- Cause: registered over UDP; linphone.org tried to reach the server's private address.
+	- Fix: register over TCP (`transport=transport-tcp`, `server_uri=sip:sip.linphone.org\;transport=tcp`).
+- ## A setting in pjsip.conf is ignored
+	- Cause: `;` starts a comment, so `;transport=tcp` vanished silently.
+	- Fix: write `\;`.
+- ## Incoming calls slow, or "488 Not Acceptable Here"
+	- Cause: the app offers encrypted audio first (SAVPF, then SAVP) and only then plain.
+	- Fix on the `linphone` endpoint: `media_encryption=sdes`, `media_encryption_optimistic=yes`, `use_avpf=yes`.
+- ## Config change has no effect after a reload
+	- Cause: single-file Docker mounts; `sed -i` and some editors replace the file, the container keeps the old one.
+	- Fix: `docker compose restart asterisk`.
+- ## Test phone keeps disconnecting (iPhone)
+	- Cause: iOS suspends the app; a home server cannot wake it. Testing only; the adapter stays connected.
+- ## Buttons vanish after an update
+	- Cause: Asterisk's database lived inside the container; Asterisk 23 ignores `astdbdir`.
+	- Fix: mount `./db/astdb.sqlite3` itself.
+- ## Call history shows "1" instead of a name
+	- It shows what was dialled. Only visible on a softphone; a corded phone has no screen.
+- ## Watch a call live
+	- `docker exec asterisk asterisk -rx "pjsip set logger on"` then `docker logs -f --since 1m asterisk`
+	- Turn it off afterwards: the log contains call encryption keys.

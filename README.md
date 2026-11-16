@@ -50,7 +50,7 @@ Step-by-step instructions: [docs/install.md](docs/install.md), then [docs/linpho
 
 ## The admin page
 
-- **Register** (first visit only): your username, password, and your child's name.
+- **Register** (first visit only): your username, password, and your child's name. Prefer not to register? Set `ADMIN_USER`, `ADMIN_PASSWORD` and `CHILD_NAME` in `.env` before the first start and you go straight to Log in.
 - **Log in**: stays signed in for 30 days on that device.
 - **Buttons**: tap a key, type a name and that person's Linphone username.
 - **Who can call**: the allowed list. Saving a button also adds that person here.
@@ -81,7 +81,6 @@ Built and tested in one day (2026-11-16), so treat it as an early version.
 - [docs/troubleshooting.md](docs/troubleshooting.md) - the problems we hit and how they were fixed
 - [docs/asterisk.md](docs/asterisk.md) - how the Asterisk configuration works
 - [CHANGELOG.md](CHANGELOG.md) - version history
-- [logseq/](logseq/) - the same documentation as a Logseq graph, with a changelog page and journal
 
 ## Security notes
 

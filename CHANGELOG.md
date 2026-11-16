@@ -1,6 +1,12 @@
 # Changelog
 
-All notable changes to this project. Newest first. The same history, with more context, is in the Logseq graph under `logseq/pages/first-phone___Changelog.md`.
+All notable changes to this project. Newest first.
+
+## [0.4.1] - 2026-11-16
+
+### Added
+- Browser-tab icon (`webui/favicon.svg`; replace the file to use your own).
+- Optional `ADMIN_USER`, `ADMIN_PASSWORD` and `CHILD_NAME` in `.env` create the parent account at first start, so the Register page can be skipped.
 
 ## [0.4.0] - 2026-11-16
 
@@ -12,7 +18,7 @@ First public release.
 - **Child's name.** Asked at registration and used across the page ("Sam's buttons", "Who can call Sam") and as caller ID on outgoing calls.
 - **Settings page**: child's name, house Linphone address, change password (which signs out other devices).
 - `scripts/setup.sh`, `.env.example`, `pjsip.conf.example`, `manager.conf.example`.
-- Documentation in `docs/` and a Logseq graph in `logseq/`.
+- Documentation in `docs/`.
 - MIT license.
 
 ### Changed

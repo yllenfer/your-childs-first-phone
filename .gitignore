@@ -7,5 +7,4 @@ webui-data/
 *.txt
 backup*/
 __pycache__/
-logseq/logseq/bak/
-logseq/.recycle/
+logseq/

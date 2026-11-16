@@ -23,5 +23,9 @@ services:
       AMI_SECRET: ${AMI_SECRET}
       KID_ENDPOINT: ${KID_ENDPOINT:-kid}
       PORT: ${WEB_PORT:-8099}
+      # Optional: create the parent account at first start instead of using the Register page.
+      ADMIN_USER: ${ADMIN_USER:-}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+      CHILD_NAME: ${CHILD_NAME:-}
     volumes:
       - ./webui-data:/data      # parent account + child's name

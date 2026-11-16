@@ -2,6 +2,8 @@
 
 What it does
   * First visit: a Register page creates the one parent account (and asks the child's name).
+    Or set ADMIN_USER, ADMIN_PASSWORD and CHILD_NAME in .env to have the account created
+    at start-up, so you go straight to Log in.
   * After that: Log in, then choose who each phone button calls and who may call the child.
 
 Where things are stored
@@ -29,6 +31,7 @@ LINE = os.environ.get("LINE_ENDPOINT", "linphone")   # the linphone.org connecti
 LP_DOMAIN = os.environ.get("LINPHONE_DOMAIN", "sip.linphone.org")
 
 CONFIG_PATH = os.path.join(DATA_DIR, "config.json")
+FAVICON_PATH = os.environ.get("FAVICON_PATH", "/favicon.svg")
 COOKIE = "firstphone"
 SESSION_DAYS = 30
 PBKDF2_ROUNDS = 310_000
@@ -272,7 +275,8 @@ def layout(title, body, cfg=None, signed_in=True):
                f"<form method=post action=/logout><button class=ghost>Log out</button></form></nav></header>")
     return (f"<!doctype html><html lang=en><head><meta charset=utf-8>"
             f"<meta name=viewport content='width=device-width,initial-scale=1'>"
-            f"<title>{esc(title)}</title><style>{CSS}</style></head>"
+            f"<title>{esc(title)}</title><link rel=icon type='image/svg+xml' href='/favicon.svg'>"
+            f"<style>{CSS}</style></head>"
             f"<body><div class=wrap>{top}{body}</div></body></html>")
 
 
@@ -502,10 +506,27 @@ class Handler(BaseHTTPRequestHandler):
         raw = self.rfile.read(length).decode("utf-8", "replace")
         return {k: v[0].strip() for k, v in parse_qs(raw).items()}
 
+    def favicon(self):
+        try:
+            with open(FAVICON_PATH, "rb") as f:
+                data = f.read()
+        except OSError:
+            self.send_response(404)
+            self.send_header("Content-Length", "0")
+            return self.end_headers()
+        self.send_response(200)
+        self.send_header("Content-Type", "image/svg+xml")
+        self.send_header("Content-Length", str(len(data)))
+        self.send_header("Cache-Control", "public, max-age=86400")
+        self.end_headers()
+        self.wfile.write(data)
+
     # -- GET
     def do_GET(self):
-        cfg = load_config()
         url = urlsplit(self.path)
+        if url.path in ("/favicon.svg", "/favicon.ico"):
+            return self.favicon()
+        cfg = load_config()
         q = {k: v[0] for k, v in parse_qs(url.query).items()}
         if not registered(cfg):
             return self.send(register_page()) if url.path == "/register" else self.go("/register")
@@ -668,5 +689,35 @@ class Handler(BaseHTTPRequestHandler):
         self.go("/settings?m=password", [self.session_cookie(cfg)])
 
 
+def seed_account():
+    """Create the parent account from .env if none exists yet (skips the Register page)."""
+    user, pw = os.environ.get("ADMIN_USER", ""), os.environ.get("ADMIN_PASSWORD", "")
+    if not user or not pw:
+        return
+    with config_lock:
+        cfg = load_config()
+        if registered(cfg):
+            return
+        if not USERNAME.match(user) or len(pw) < 10:
+            print("ADMIN_USER / ADMIN_PASSWORD ignored: username 3-32 simple characters, password 10+ characters")
+            return
+        salt = secrets.token_hex(16)
+        cfg.update(username=user, salt=salt, hash=hash_password(pw, salt), cookie_key=secrets.token_hex(32))
+        name = os.environ.get("CHILD_NAME", "")
+        if NAME.match(name):
+            cfg.setdefault("child_name", name)
+        cfg.setdefault("house_address", os.environ.get("HOUSE_ADDRESS", ""))
+        save_config(cfg)
+        print(f"created the parent account '{user}' from .env")
+    for _ in range(10):  # Asterisk may still be starting
+        try:
+            if cfg.get("child_name"):
+                db_put("config", "childname", cfg["child_name"])
+            break
+        except Exception:
+            time.sleep(3)
+
+
 if __name__ == "__main__":
+    threading.Thread(target=seed_account, daemon=True).start()
     ThreadingHTTPServer(("0.0.0.0", PORT), Handler).serve_forever()

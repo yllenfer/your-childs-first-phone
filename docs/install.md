@@ -73,7 +73,7 @@ The host computer must not sleep. If it sleeps, the phone stops working.
 
    The line should end with `Registered`. If it says `Rejected` or `Unregistered`, see [troubleshooting.md](troubleshooting.md).
 
-5. Open `http://<server-address>:8099`. The first visit shows **Register**: enter your child's name, a username and a password of at least 10 characters. Do this straight away, because whoever opens the page first becomes the owner.
+5. Open `http://<server-address>:8099`. The first visit shows **Register**: enter your child's name, a username and a password of at least 10 characters. Do this straight away, because whoever opens the page first becomes the owner. To skip this page, put `ADMIN_USER`, `ADMIN_PASSWORD` and `CHILD_NAME` in `.env` before step 3.
 
 6. In **Settings**, type the house Linphone username so the main page can remind you what relatives should dial.
 
